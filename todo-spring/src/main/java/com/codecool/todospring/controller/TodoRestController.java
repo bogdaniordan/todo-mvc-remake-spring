@@ -37,9 +37,7 @@ public class TodoRestController {
             todos = todoRepository.findAll();
         } else {
             todos = todoRepository.findTodosByStatus(param.get("status"));
-        }
-//        System.out.println(param.get("status"));
-//        System.out.println(todos);
+        };
         JSONArray arr = new JSONArray();
         for (Todo dao : todos) {
             JSONObject jo = new JSONObject();
@@ -51,7 +49,6 @@ public class TodoRestController {
         return arr.toString(2);
     }
 
-
     // Remove all completed
     @DeleteMapping("/todos/completed")
     public void deleteCompleted() {
@@ -59,11 +56,16 @@ public class TodoRestController {
         todos.forEach(todo -> todoRepository.delete(todo));
     }
 
-
     //Toggle all status
     @PutMapping("/todos/toggle_all")
     public void toggleAll(@RequestParam Map<String, String> param) {
         String complete = param.get("toggle-all");
         todoDAO.toggleAll(complete.equals("true"));
+    }
+
+    //Remove by id
+    @DeleteMapping("todos/{id}")
+    public void deleteById(@RequestParam Map<String, String> param, @PathVariable String id) {
+        todoRepository.deleteById(Long.parseLong(id));
     }
 }
