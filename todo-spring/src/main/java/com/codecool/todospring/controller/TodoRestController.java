@@ -7,10 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,22 +18,24 @@ public class TodoRestController {
     @Autowired
     TodoRepository todoRepository;
 
+    //Add new
     @PostMapping("/addTodo")
     public void addTodo(@RequestParam Map<String, String> param) {
         Todo todo = new Todo(param.get("todo-title"), Status.ACTIVE);
         todoRepository.save(todo);
     }
 
+    //List by id
     @PostMapping("/list")
     public String todosList(@RequestParam Map<String, String> param) throws JSONException {
-        List<Todo> todos = null;
+        List<Todo> todos;
         if (param.get("status").equals("")) {
             todos = todoRepository.findAll();
         } else {
             todos = todoRepository.findTodosByStatus(param.get("status"));
         }
-        System.out.println(param.get("status"));
-        System.out.println(todos);
+//        System.out.println(param.get("status"));
+//        System.out.println(todos);
         JSONArray arr = new JSONArray();
         for (Todo dao : todos) {
             JSONObject jo = new JSONObject();
@@ -48,4 +47,11 @@ public class TodoRestController {
         return arr.toString(2);
     }
 
+
+    // Remove all completed
+    @DeleteMapping("/todos/completed")
+    public void deleteCompleted() {
+        List<Todo> todos = todoRepository.findTodosByStatus("COMPLETE");
+        todos.forEach(todo -> todoRepository.delete(todo));
+    }
 }

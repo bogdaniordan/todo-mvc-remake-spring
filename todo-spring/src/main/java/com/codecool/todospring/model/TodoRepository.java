@@ -11,4 +11,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     @Query(value = "SELECT * FROM to_do WHERE status = ?1", nativeQuery = true)
     List<Todo> findTodosByStatus(String status);
+
+
 }
