@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -36,8 +37,10 @@ public class TodoRestController {
         if (param.get("status").equals("")) {
             todos = todoRepository.findAll();
         } else {
-            todos = todoRepository.findTodosByStatus(param.get("status"));
+            todos = todoRepository.findTodosByStatus(param.get("status").toUpperCase(Locale.ROOT));
         };
+        System.out.println(todos);
+        System.out.println(param.get("status").toUpperCase(Locale.ROOT));
         JSONArray arr = new JSONArray();
         for (Todo dao : todos) {
             JSONObject jo = new JSONObject();
@@ -67,5 +70,28 @@ public class TodoRestController {
     @DeleteMapping("todos/{id}")
     public void deleteById(@RequestParam Map<String, String> param, @PathVariable String id) {
         todoRepository.deleteById(Long.parseLong(id));
+    }
+
+    //Update by id
+    @PutMapping("/todos/{id}")
+    public void updateById(@RequestParam Map<String, String> param, @PathVariable String id) {
+        if (todoRepository.findById(Long.parseLong(id)).isPresent()) {
+            Todo todo = todoRepository.findById(Long.parseLong(id)).get();
+            todo.setTitle(param.get("todo-title"));
+            todoRepository.save(todo);
+        }
+    }
+
+    //Find by id
+    @GetMapping("/todos/{id}")
+    public Todo findById(@PathVariable String id) {
+        return todoRepository.findById(Long.parseLong(id)).orElse(null);
+    }
+
+    //Toggle status by id
+    @PutMapping("/todos/{id}/toggle_status")
+    public void toggleById(@RequestParam Map<String, String> param, @PathVariable String id) {
+        boolean completed = param.get("status").equals("true");
+        todoDAO.toggleToDoStatus(id, completed);
     }
 }
