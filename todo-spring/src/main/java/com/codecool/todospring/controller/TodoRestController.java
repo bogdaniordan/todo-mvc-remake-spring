@@ -2,6 +2,7 @@ package com.codecool.todospring.controller;
 
 import com.codecool.todospring.model.Status;
 import com.codecool.todospring.model.Todo;
+import com.codecool.todospring.model.TodoDAO;
 import com.codecool.todospring.model.TodoRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,9 @@ public class TodoRestController {
 
     @Autowired
     TodoRepository todoRepository;
+
+    @Autowired
+    TodoDAO todoDAO;
 
     //Add new
     @PostMapping("/addTodo")
@@ -53,5 +57,13 @@ public class TodoRestController {
     public void deleteCompleted() {
         List<Todo> todos = todoRepository.findTodosByStatus("COMPLETE");
         todos.forEach(todo -> todoRepository.delete(todo));
+    }
+
+
+    //Toggle all status
+    @PutMapping("/todos/toggle_all")
+    public void toggleAll(@RequestParam Map<String, String> param) {
+        String complete = param.get("toggle-all");
+        todoDAO.toggleAll(complete.equals("true"));
     }
 }
